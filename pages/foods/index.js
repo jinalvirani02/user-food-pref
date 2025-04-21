@@ -1,15 +1,7 @@
+// pages/foods.js
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
-export default function Foods() {
-  const [foods, setFoods] = useState([]);
-
-  useEffect(() => {
-    fetch('/api/foods')
-      .then(res => res.json())
-      .then(data => setFoods(data));
-  }, []);
-
+export default function Foods({ foods }) {
   return (
     <div>
       <h1>Food List</h1>
@@ -22,4 +14,15 @@ export default function Foods() {
       </ul>
     </div>
   );
+}
+
+export async function getServerSideProps() {
+  const res = await fetch('http://localhost:3000/api/foods');
+  const data = await res.json();
+
+  return {
+    props: {
+      foods: data
+    }
+  };
 }

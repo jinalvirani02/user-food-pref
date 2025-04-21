@@ -1,21 +1,18 @@
 // pages/profile.js
-import { useSession } from "next-auth/react";
+import { getSession } from "next-auth/react";
 import { useEffect } from "react";
 
-export default function Profile() {
-  const { data: session, status } = useSession();
-
+export default function Profile({ session }) {
   useEffect(() => {
-    console.log("here", typeof window)
     if (session?.user && typeof window !== "undefined") {
       const { email, id, first_name, last_name, name } = session.user;
 
       let retries = 0;
       const maxRetries = 10;
-
+      console.log("in")
       const tryIdentify = () => {
-        console.log("here")
         if (typeof window.jstag !== "undefined") {
+          console.log({email, user_id: id, first_name: first_name, last_name: last_name})
           window.jstag.identify({
             email,
             user_id: id,
@@ -25,7 +22,7 @@ export default function Profile() {
           console.log("[Lytics] User identified:", email);
         } else if (retries < maxRetries) {
           retries++;
-          setTimeout(tryIdentify, 300); // Retry after 300ms
+          setTimeout(tryIdentify, 300);
         } else {
           console.warn("[Lytics] jstag not available after retries");
         }
@@ -34,10 +31,6 @@ export default function Profile() {
       tryIdentify();
     }
   }, [session]);
-
-  if (status === "loading") {
-    return <p>Loading...</p>;
-  }
 
   if (!session) {
     return <p>You must be logged in to view this page.</p>;
@@ -50,4 +43,15 @@ export default function Profile() {
       <p>Email: {session.user.email}</p>
     </div>
   );
+}
+
+// Server-side session fetch
+export async function getServerSideProps(context) {
+  const session = await getSession(context);
+
+  return {
+    props: {
+      session,
+    },
+  };
 }

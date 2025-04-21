@@ -1,20 +1,6 @@
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-
-export default function FoodDetail() {
-  const router = useRouter();
-  const { id } = router.query;
-  const [food, setFood] = useState(null);
-
-  useEffect(() => {
-    if (id) {
-      fetch(`/api/foods/${id}`)
-        .then(res => res.json())
-        .then(data => setFood(data));
-    }
-  }, [id]);
-
-  if (!food) return <p>Loading...</p>;
+// pages/foods/[id].js
+export default function FoodDetail({ food }) {
+  if (!food) return <p>Food not found.</p>;
 
   return (
     <div>
@@ -22,4 +8,31 @@ export default function FoodDetail() {
       <p>{food.description}</p>
     </div>
   );
+}
+
+export async function getServerSideProps(context) {
+  const { id } = context.params;
+
+  try {
+    const res = await fetch(`http://localhost:3000/api/foods/${id}`);
+    const food = await res.json();
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch');
+    }
+
+    return {
+      props: {
+        food,
+      },
+    };
+  } catch (err) {
+    console.error("Error fetching food:", err);
+
+    return {
+      props: {
+        food: null,
+      },
+    };
+  }
 }
