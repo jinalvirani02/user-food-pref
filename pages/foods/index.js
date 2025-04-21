@@ -16,8 +16,12 @@ export default function Foods({ foods }) {
   );
 }
 
-export async function getServerSideProps() {
-  const res = await fetch('http://localhost:3000/api/foods');
+export async function getServerSideProps(context) {
+  const protocol = context.req.headers['x-forwarded-proto'] || 'http';
+  const host = context.req.headers.host;
+  const baseUrl = `${protocol}://${host}`;
+  console.log(baseUrl, "baseUrl")
+  const res = await fetch(`${baseUrl}/api/foods`);
   const data = await res.json();
 
   return {

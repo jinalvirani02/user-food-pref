@@ -12,9 +12,12 @@ export default function FoodDetail({ food }) {
 
 export async function getServerSideProps(context) {
   const { id } = context.params;
+  const protocol = context.req.headers['x-forwarded-proto'] || 'http';
+  const host = context.req.headers.host;
+  const baseUrl = `${protocol}://${host}`;
 
   try {
-    const res = await fetch(`http://localhost:3000/api/foods/${id}`);
+    const res = await fetch(`${baseUrl}/api/foods/${id}`);
     const food = await res.json();
 
     if (!res.ok) {
