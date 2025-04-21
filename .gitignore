@@ -33,8 +33,5 @@ Thumbs.db
 .env.test.local
 .env.production.local
 
-# SQLite DB file (if you use SQLite)
-database.sqlite
-
 # npm package lock (optional, based on your preference)
 npm-debug.log
